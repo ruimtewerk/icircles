@@ -192,7 +192,6 @@
 				var pos = getMousePos(e);
 				var issueIndex = getIssueIntersection(pos.x, pos.y);
 				if (issueIndex != null) {
-					alert('issue');
 					draggedIssue = sprites[issueIndex];
 					draggedIssueIndex = issueIndex;
 					$('canvas').css('cursor', 'grabbing');
@@ -205,6 +204,7 @@
 
 			function Canvas_mouseup(e) {
 				if (draggedIssue != null) {
+					alert('issueup');
 					if (isInfinityIntersection(draggedIssue)) {
 						sprites.splice(draggedIssueIndex, 1);
 						spiralImg.animating = true;
