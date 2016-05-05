@@ -51,9 +51,9 @@
 				}
 
 				// prevent window scrolling
-				//$('body').bind('touchmove', function (ev) {
-				//	ev.preventDefault();
-				//});
+				$('body').bind('touchmove', function (ev) {
+					ev.preventDefault();
+				});
 
 				infinityImg = new Image();
 				infinityImg.onload = function () {
