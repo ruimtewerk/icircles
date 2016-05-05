@@ -1,0 +1,115 @@
+﻿body
+{
+
+}
+
+#page {
+	margin-left:auto;
+	margin-right:auto;
+	width:1024px;
+	height:768px;
+	background-color:White;
+	position:relative;
+}
+
+canvas 
+{
+	border:1px solid #000000;
+}
+
+#addDiv 
+{
+	position:absolute;
+	top:30px;
+	left:30px;
+	width: 140px;
+	height: 160px;
+	background-color: #CAF0F6;
+	display: none;
+	border: solid 1px;
+	border-radius: 25px;
+	padding: 10px;
+	box-shadow: 10px 10px 5px #888888;
+}
+
+#addName 
+{
+	margin-top: 5px;
+	margin-left: 10px;
+	width: 115px;
+}
+
+#valueDiv
+{
+	margin-top: 5px;
+	margin-left: 10px;
+	width: 110px;
+	border: solid 1px;
+	padding: 2px;
+}
+
+.valueRadio
+{
+	margin-right: 0px;
+}
+
+.valueImg
+{
+	width: 16px;
+	height: 16px;
+}
+
+#colorDiv
+{
+	margin-top: 5px;
+	margin-left: 5px;
+	width: 110px;
+	padding: 2px;
+}
+
+#addColor
+{
+	width: 120px;
+	padding: 3px;
+}
+
+#addFeeling
+{
+	margin-top: 10px;
+	margin-left: 10px;
+	width: 115px;
+	padding: 2px;
+}
+
+#buttonDiv
+{
+	margin-top: 10px;
+	margin-left: 15px;
+	width: 115px;
+	padding: 2px;
+}
+
+.addButton
+{
+	width: 45px;
+}
+
+.cancelButton
+{
+	width: 45px;
+}
+
+#fileDiv
+{
+	margin-bottom: 5px;
+}
+
+.mainButton
+{
+	width: 75px;
+}
+
+#selectFile
+{
+	display: none;
+}

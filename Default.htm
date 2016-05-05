@@ -1,0 +1,551 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>ruimtewerk.nu - iCircles</title>
+		<link rel="stylesheet" type="text/css" href="iCircles.css" />
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.js"></script>
+	</head>
+	<body onload="init()">
+		<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+
+		<script type="text/javascript">
+
+			var canvas;
+			var ctx;
+			var hasStorage;
+			var lstorage;
+			var lstorageItemName = "iCircles";
+			var sprites;
+			var draggedIssue;
+			var draggedIssueIndex;
+			var issueSize = { x: 125, y: 50 };
+			var infinityImg;
+			var infinityPos = { x: 790, y: 35 };
+			var infinitySize = { x: 116, y: 37 };
+			var addButtonPos = { x: 100, y: 65 };
+			var addButtonSize = 25;
+			var aesKey = "tattvamasi";
+
+			// shim layer with setTimeout fallback
+			window.requestAnimFrame = (function () {
+				return window.requestAnimationFrame ||
+					       window.webkitRequestAnimationFrame ||
+						   window.mozRequestAnimationFrame ||
+						   window.oRequestAnimationFrame ||
+						   window.msRequestAnimationFrame ||
+						   function (callback) {
+						   	window.setTimeout(callback, 1000 / 60);
+						   };
+			})(); 
+
+			function init() {
+				canvas = document.querySelector('canvas');
+				ctx = canvas.getContext('2d');
+				sprites = new Array();
+
+				fitToContainer(canvas);
+
+				hasStorage = hasLocalStorage();
+				if (hasStorage == false) {
+					alert("Geen localStorage!");
+				}
+
+				infinityImg = new Image();
+				infinityImg.onload = function () {
+					draw();
+				}
+				infinityImg.src = 'Infinity.png';
+
+				spiralImg = new Image();
+				spiralImg.onload = function () {
+					draw();
+				}
+				spiralImg.src = 'spiral_animation.gif';
+				spiralImg.animating = false;
+
+				Issue.prototype.draw = Issue_draw;
+				Issue.prototype.serialize = Issue_serialize;
+				Issue.prototype.deserialize = Issue_deserialize;
+				Issue.Width = issueSize.x;
+				Issue.Height = issueSize.y;
+
+				canvas.onmousemove = Canvas_mousemove;
+				canvas.onmousedown = Canvas_mousedown;
+				canvas.onmouseup = Canvas_mouseup;
+
+				if (hasStorage) {
+					restoreIssues();
+				}
+
+				draw();
+				
+				// event handler for loading files
+				$('#selectFile').on('change', function () { loadData(); });
+
+				// check for the File API support
+				if (!window.File || !window.FileReader) {
+					alert('The File APIs are not fully supported in this browser.');
+				}
+			}
+
+			function draw() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				drawICircles();
+
+				drawWidgets();
+
+				for (var s = 0; s < sprites.length; s++) {
+					sprites[s].draw();
+				}
+			}
+
+			function Issue(x, y, color, title, desc, value) {
+				this.x = x;
+				this.y = y;
+				this.color = color;
+				this.title = title;
+				this.desc = desc;
+				this.value = value;
+			}
+
+			function Issue_draw() {
+				drawEllipse(this.x, this.y, Issue.Width, Issue.Height, this.color);
+
+				var deltaXText = -33;
+				var deltaYText = -3;
+				drawFilledText(this.x + deltaXText, this.y + deltaYText, "bold 11px Georgia", '#000000', this.title);
+				//drawLine(this.x + deltaXText, this.y + deltaYText + 2, this.x + deltaXText + 65, this.y + deltaYText + 2, '#000000', 1)
+				drawFilledText(this.x + deltaXText, this.y + deltaYText + 15, "11px Georgia", '#000000', this.desc);
+
+				var deltaXValue = 45;
+				var deltaYValue = -20;
+				drawCircle(this.x + deltaXValue, this.y + deltaYValue, 10, '#FFB347', 1);
+				drawFilledText(this.x + deltaXValue - 5, this.y + deltaYValue + 5, "bold 16px Georgia", '#000000', this.value);
+			}
+
+			function Issue_serialize() {
+				var buffer = '';
+				var encryptedTitle = CryptoJS.AES.encrypt(this.title, "tattvamasi");
+				buffer += encryptedTitle + " ";
+				var encryptedDesc = CryptoJS.AES.encrypt(this.desc, "tattvamasi");
+				buffer += encryptedDesc + " ";
+				buffer += this.color + " ";
+				buffer += this.value + " ";
+				buffer += this.x + " ";
+				buffer += this.y;
+				return buffer;
+			}
+
+			function Issue_deserialize(buffer) {
+				var fields = buffer.split(" ");
+
+				this.title = CryptoJS.AES.decrypt(fields[0], aesKey).toString(CryptoJS.enc.Utf8);
+				this.desc = CryptoJS.AES.decrypt(fields[1], aesKey).toString(CryptoJS.enc.Utf8);
+				this.color = fields[2];
+				this.value = fields[3];
+				this.x = parseInt(fields[4]);
+				this.y = parseInt(fields[5]);
+			}
+
+			function Canvas_mousemove(e) {
+				var pos = getMousePos(e);
+				if (draggedIssue != null) {
+					// re-position
+					draggedIssue.x = pos.x;
+					draggedIssue.y = pos.y;
+					// re-order
+					if (draggedIssueIndex < sprites.length - 1) {
+						var issue = sprites.splice(draggedIssueIndex, 1);
+						draggedIssueIndex = sprites.push(issue[0]) - 1;
+					}
+					// re-draw
+					draw();
+				}
+				else if (isClickable(pos)) {
+					$('canvas').css('cursor', 'pointer');
+				}
+				else {
+					$('canvas').css('cursor', 'auto');
+				}
+			}
+
+			function isClickable(pos) {
+				return getIssueIntersection(pos.x, pos.y) != null || isOverAddButton(pos);
+			}
+
+			function isOverAddButton(pos) {
+				return Math.pow(pos.x - addButtonPos.x, 2) + Math.pow(pos.y - addButtonPos.y, 2) <= Math.pow(addButtonSize, 2)
+			}
+
+			function Canvas_mousedown(e) {
+				var pos = getMousePos(e);
+				var issueIndex = getIssueIntersection(pos.x, pos.y);
+				if (issueIndex != null) {
+					draggedIssue = sprites[issueIndex];
+					draggedIssueIndex = issueIndex;
+					$('canvas').css('cursor', 'grabbing');
+				}
+				else if (isOverAddButton(pos)) {
+					initForm();
+					$('#addDiv').fadeIn("1000", function () { $('#addName').focus(); });
+				}
+			}
+
+			function Canvas_mouseup(e) {
+				if (draggedIssue != null) {
+					if (isInfinityIntersection(draggedIssue)) {
+						sprites.splice(draggedIssueIndex, 1);
+						spiralImg.animating = true;
+						spiralImg.rotation = 0;
+						spiralImg.scale = 1.0;
+						spiralImg.startTime = (new Date()).getTime();
+						spiral_animate();
+					}
+					storeIssues();
+				}
+				draggedIssue = null;
+				draggedIssueIndex = null;
+				$('canvas').css('cursor', 'auto');
+			}
+
+			function spiral_animate() {
+				var deltaTime = (new Date()).getTime() - spiralImg.startTime;
+				if (deltaTime < 1000) {
+					spiralImg.rotation += 10;
+					spiralImg.scale *= 0.95;
+					window.requestAnimFrame(spiral_animate);
+				}
+				else {
+					spiralImg.animating = false;
+				}
+				draw();
+			}
+
+			function isInfinityIntersection(issue) {
+				var intersect = 
+					infinityPos.x + infinitySize.x / 2 >= issue.x - Issue.Width / 2 && infinityPos.x + infinitySize.x / 2 <= issue.x + Issue.Width / 2 &&
+					infinityPos.y + infinitySize.y / 2 >= issue.y - Issue.Height / 2 && infinityPos.y + infinitySize.y / 2 <= issue.y + Issue.Height / 2;
+				return intersect;
+			}
+
+			function getMousePos(e) {
+				var rect = canvas.getBoundingClientRect();
+				return {
+					x: Math.round((e.clientX - rect.left) / (rect.right - rect.left) * canvas.width),
+					y: Math.round((e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height)
+				};
+			}
+
+			function getIssueIntersection(x, y) {
+				for (var s = sprites.length - 1; s >= 0; s--) {
+					var issue = sprites[s];
+					if (x >= issue.x - Issue.Width / 2 && x <= issue.x + Issue.Width / 2 &&
+						y >= issue.y - Issue.Height / 2 && y <= issue.y + Issue.Height / 2)
+						return s;
+				}
+				return null;
+			}
+
+			function fitToContainer(canvas) {
+				canvas.style.width = '100%';
+				canvas.style.height = '100%';
+				canvas.width = canvas.offsetWidth;
+				canvas.height = canvas.offsetHeight;
+			}
+
+			function drawICircles() {
+				drawICircle(350, '#ADD8E6');
+				drawICircle(235, '#87CEEB');
+				drawICircle(125, '#1E90FF');
+			}
+
+			function drawICircle(radius, color) {
+				drawCircle(canvas.width / 2, canvas.height / 2, radius, color, 0);
+			}
+
+			function drawWidgets() {
+				// infinity symbol
+				ctx.drawImage(infinityImg, infinityPos.x, infinityPos.y)
+
+				if (spiralImg.animating) {
+					// spiral animation
+					ctx.save();
+					ctx.translate(infinityPos.x + infinitySize.x / 2, infinityPos.y + infinitySize.y / 2);
+					ctx.rotate(spiralImg.rotation);
+					ctx.scale(spiralImg.scale, spiralImg.scale);
+					ctx.drawImage(spiralImg, -30, -30);
+					ctx.restore();
+				}
+
+				// arrow
+				drawArrow(canvas.width / 2, canvas.height / 2, canvas.width / 2 + 300, canvas.height / 2 - 300, 3);
+
+				// text
+				drawStrokedText(canvas.width / 2 + 115, canvas.height / 2 - 185, "bold 36px Arial", '#000000', "\"Ik\"");
+
+				// add button
+				drawCircle(addButtonPos.x, addButtonPos.y, addButtonSize, '#47BFD5', 0);
+				drawFilledText(addButtonPos.x - 13, addButtonPos.y + 17, "bold 48px Arial", 'white', '+');
+			}
+
+			function drawCircle(x, y, radius, color, border) {
+				if (border) {
+					ctx.strokeStyle = '#000000';
+					ctx.lineWidth = 1;
+				}
+				ctx.fillStyle = color;
+				ctx.beginPath();
+				ctx.arc(x, y, radius, 0, 2 * Math.PI);
+				ctx.closePath();
+				ctx.fill()
+				if (border) {
+					ctx.stroke();
+				}
+			}
+
+			function drawLine(x1, y1, x2, y2, color, thickness) {
+				ctx.beginPath();
+				ctx.strokeStyle = color;
+				ctx.lineWidth = thickness;
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+			}
+
+			function drawEllipse(centerX, centerY, width, height, color) {
+
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY - height / 2); 		// A1
+
+				ctx.bezierCurveTo(
+					centerX + width / 2, centerY - height / 2,	// C1
+					centerX + width / 2, centerY + height / 2,	// C2
+					centerX, centerY + height / 2				// A2
+				);
+
+				ctx.bezierCurveTo(
+					centerX - width / 2, centerY + height / 2,	// C3
+					centerX - width / 2, centerY - height / 2,	// C4
+					centerX, centerY - height / 2				// A1
+				);
+
+				ctx.fillStyle = color;
+				ctx.fill();
+				ctx.closePath();
+			}
+
+			function drawFilledText(x, y, font, color, text) {
+				ctx.font = font;
+				ctx.fillStyle = color;
+				ctx.fillText(text, x, y);
+			}
+
+			function drawStrokedText(x, y, font, color, text) {
+				ctx.font = font;
+				ctx.strokeStyle = color;
+				ctx.strokeText(text, x, y);
+			}
+
+			function drawArrow(x1, y1, x2, y2, lineWidth) {
+				ctx.save();
+				var dist = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+
+				ctx.beginPath();
+				ctx.lineWidth = lineWidth;
+				ctx.strokeStyle = '#000000';
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+
+				var angle = Math.acos((y2 - y1) / dist);
+
+				if (x2 < x1) angle = 2 * Math.PI - angle;
+
+				var size = 15;
+
+				ctx.beginPath();
+				ctx.translate(x2, y2);
+				ctx.rotate(-angle);
+				ctx.fillStyle = '#000000';
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = '#000000';
+				ctx.moveTo(0, -size);
+				ctx.lineTo(-size, -size);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(size, -size);
+				ctx.lineTo(0, -size);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.restore();
+
+				ctx.save();
+				ctx.beginPath();
+				ctx.translate(x1, y1);
+				ctx.rotate(angle + 0.5 * Math.PI);
+				ctx.fillStyle = '#000000';
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = '#000000';
+				ctx.moveTo(0, size);
+				ctx.lineTo(-size, size);
+				ctx.lineTo(0, 0);
+				ctx.lineTo(size, size);
+				ctx.lineTo(0, size);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.restore();
+			}
+
+			function addIssue() {
+				var name = $('#addName').val();
+				var value = $('input[name=addValue]:checked', '#addForm').val();
+				var feeling = $('#addFeeling').val();
+				var color = $('#addColor').val();
+				var newIssue = new Issue(addButtonPos.x, addButtonPos.y + 70, color, name, feeling, value);
+				sprites.push(newIssue);
+
+				closeForm();
+				storeIssues();
+				draw();
+			}
+
+			function initForm() {
+				$('#addName').val('');
+				$("#addValue_1").prop("checked", true)
+				$("#addColor_1").prop("checked", true)
+				$('#addFeeling select').val("liefde");
+			}
+
+			function closeForm() {
+				$('#addDiv').fadeOut();
+			}
+
+			function hasLocalStorage() {
+				lstorage = window.localStorage;
+				var test = 'test';
+				try {
+					lstorage.setItem(test, test);
+					lstorage.removeItem(test);
+					return true;
+				} catch (e) {
+					return false;
+				}
+			}
+
+			function serializeIssues() {
+				var buffer = '';
+				for (var s = 0; s < sprites.length; s++) {
+					var sprite = sprites[s];
+					buffer += sprite.serialize();
+					buffer += "|";
+				}
+				return buffer;
+			}
+
+			function storeIssues() {
+				var buffer = serializeIssues();
+				lstorage.setItem(lstorageItemName, buffer);
+			}
+
+			function deserializeIssues(buffer) {
+				var issueBuffers = buffer.split("|");
+				for (var ib = 0; ib < issueBuffers.length - 1; ib++) {
+					var issue = new Issue();
+					issue.deserialize(issueBuffers[ib]);
+					sprites.push(issue);
+				} 
+			}
+
+			function restoreIssues() {
+				var buffer = lstorage.getItem(lstorageItemName);
+				deserializeIssues(buffer);
+			}
+
+			function loadData() {
+				var file = $('#selectFile')[0].files[0];
+				var textType = /text.*/;
+
+				if (file.type.match(textType)) {
+					var reader = new FileReader();
+
+					reader.onload = function (e) {
+						sprites = [];
+						deserializeIssues(reader.result);
+						draw();
+					}
+
+					reader.readAsText(file);
+				} else {
+					alert("File not supported!");
+				}
+			}
+
+			function saveData() {
+				var buffer = serializeIssues();
+				var today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+				var filename = 'iCircles_' + today + '.def';
+
+				var pom = document.createElement('a');
+				pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(buffer));
+				pom.setAttribute('download', filename);
+
+				if (document.createEvent) {
+					var event = document.createEvent('MouseEvents');
+					event.initEvent('click', true, true);
+					pom.dispatchEvent(event);
+				}
+				else {
+					pom.click();
+				}
+			}
+
+		</script>
+		<div id="page">
+			<div id="fileDiv">
+				<input type="file" id="selectFile" accept=".def" />
+				<button class="mainButton" type="button" onclick="$('#selectFile').click();">Openen</button>
+				<button class="mainButton" type="button" onclick="saveData()">Opslaan</button>
+			</div>
+			<canvas>
+				Your browser does not support the HTML5 canvas tag.
+			</canvas>
+			<div id="addDiv">
+				<form id="addForm" action="">
+					<input type="text" id="addName" name="name" value="" />
+					<div id="valueDiv">
+						<input class="valueRadio" type="radio" name="addValue" id="addValue_1" value="+" /><img class='valueImg' src='plus.png' />
+						<input class="valueRadio" type="radio" name="addValue" id="addValue_2" value="-" /><img class='valueImg' src='minus.png' />
+						<input class="valueRadio" type="radio" name="addValue" id="addValue_3" value="0" /><img class='valueImg' src='zero.png' />
+					</div>
+					<div id="colorDiv">
+						<input type="color" id="addColor" value="#FF8080"/>
+					</div>
+					<select id="addFeeling">
+						<option value="liefde">liefde</option>
+						<option value="bang">bang</option>
+						<option value="blij">blij</option>
+						<option value="boos">boos</option>
+						<option value="verlangen">verlangen</option>
+						<option value="verdrietig">verdrietig</option>
+						<option value="verbaasd">verbaasd</option>
+						<option value="schaamte">schaamte</option>
+						<option value="afschuw">afschuw</option>
+						<option value="jaloers">jaloers</option>
+						<option value="trots">trots</option>
+						<option value="spijt">spijt</option>
+						<option value="haat">haat</option>
+						<option value="schuldgevoel">schuldgevoel</option>
+						<option value="neutraal">neutraal</option>
+						<option value="anders">anders</option>
+					</select>
+					<div id="buttonDiv">
+						<button class="addButton" type="button" onclick="addIssue()"><img src='check2.png' /></button>
+						<button class="cancelButton" type="button" onclick="closeForm()"><img src='delete2.png' /></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
