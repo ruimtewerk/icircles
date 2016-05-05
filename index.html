@@ -160,7 +160,7 @@
 
 			function Canvas_mousemove(e) {
 				var pos = getMousePos(e);
-				drawFilledText(pos.x + 200, pos.y, "bold 12px Georgia", "#FF0000", e.type);
+				drawFilledText(pos.x + 100, pos.y, "bold 12px Georgia", "#FF0000", e.type);
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
