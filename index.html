@@ -84,7 +84,7 @@
 //				canvas.addEventListener("touchcancel", Canvas_mouseup, false);
 
 				canvas.addEventListener("mousemove", function () { alert('mousemove') }, false);
-				canvas.addEventListener("touchmove", function () { alert('touchmove') }, true);
+				canvas.addEventListener("touchmove", function () { preventDefault(); Canvas_mousemove(); }, true);
 				canvas.addEventListener("mousedown", function () { alert('mousedown') }, false);
 				canvas.addEventListener("touchstart", function () { alert('touchstart') }, false);
 				canvas.addEventListener("mouseup", function () { alert('mouseup') }, false);
