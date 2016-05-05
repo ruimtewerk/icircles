@@ -75,20 +75,20 @@
 				Issue.Width = issueSize.x;
 				Issue.Height = issueSize.y;
 
-//				canvas.addEventListener("mousemove", Canvas_mousemove, false);
-//				canvas.addEventListener("touchmove", Canvas_mousemove, true);
-//				canvas.addEventListener("mousedown", Canvas_mousedown, false);
-//				canvas.addEventListener("touchstart", Canvas_mousedown, false);
-//				canvas.addEventListener("mouseup", Canvas_mouseup, false);
-//				canvas.addEventListener("touchend", Canvas_mouseup, false);
-//				canvas.addEventListener("touchcancel", Canvas_mouseup, false);
+				canvas.addEventListener("mousemove", Canvas_mousemove, false);
+				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); Canvas_mousemove(); }, true);
+				canvas.addEventListener("mousedown", Canvas_mousedown, false);
+				canvas.addEventListener("touchstart", Canvas_mousedown, false);
+				canvas.addEventListener("mouseup", Canvas_mouseup, false);
+				canvas.addEventListener("touchend", Canvas_mouseup, false);
+				canvas.addEventListener("touchcancel", Canvas_mouseup, false);
 
-				canvas.addEventListener("mousemove", function () { alert('mousemove') }, false);
-				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); alert('touchmove'); }, true);
-				canvas.addEventListener("mousedown", function () { alert('mousedown') }, false);
-				canvas.addEventListener("touchstart", function () { Canvas_mousedown }, false);
-				canvas.addEventListener("mouseup", function () { alert('mouseup') }, false);
-				canvas.addEventListener("touchend", function () { alert('touchend') }, false);
+//				canvas.addEventListener("mousemove", function () { alert('mousemove') }, false);
+//				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); alert('touchmove'); }, true);
+//				canvas.addEventListener("mousedown", function () { alert('mousedown') }, false);
+//				canvas.addEventListener("touchstart", function () { Canvas_mousedown }, false);
+//				canvas.addEventListener("mouseup", function () { alert('mouseup') }, false);
+//				canvas.addEventListener("touchend", function () { alert('touchend') }, false);
 				//canvas.addEventListener("touchcancel", function () { alert('touchcancel') }, false);
 
 				if (hasStorage) {
