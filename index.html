@@ -86,7 +86,7 @@
 				canvas.addEventListener("mousemove", function () { alert('mousemove') }, false);
 				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); alert('mousemove'); }, true);
 				canvas.addEventListener("mousedown", function () { alert('mousedown') }, false);
-				canvas.addEventListener("touchstart", function () { alert('touchstart') }, false);
+				canvas.addEventListener("touchstart", function () { Canvas_mousedown }, false);
 				canvas.addEventListener("mouseup", function () { alert('mouseup') }, false);
 				canvas.addEventListener("touchend", function () { alert('touchend') }, false);
 				//canvas.addEventListener("touchcancel", function () { alert('touchcancel') }, false);
