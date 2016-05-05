@@ -190,7 +190,7 @@
 
 			function Canvas_mousedown(e) {
 				var pos = getMousePos(e);
-				drawFilledText(p.x + 200, p.y, "bold 12px Georgia", "#FF00FF", e.type);
+				drawFilledText(pos.x + 200, pos.y, "bold 12px Georgia", "#FF00FF", e.type);
 				var issueIndex = getIssueIntersection(pos.x, pos.y);
 				if (issueIndex != null) {
 					draggedIssue = sprites[issueIndex];
@@ -206,7 +206,7 @@
 
 			function Canvas_mouseup(e) {
 				var pos = getMousePos(e);
-				drawFilledText(p.x + 200, p.y, "bold 12px Georgia", "#FF00FF", e.type);
+				drawFilledText(pos.x, pos.y, "bold 12px Georgia", "#FF00FF", e.type);
 				if (draggedIssue != null) {
 					if (isInfinityIntersection(draggedIssue)) {
 						sprites.splice(draggedIssueIndex, 1);
