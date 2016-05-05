@@ -51,6 +51,7 @@
 					alert("Geen localStorage!");
 				}
 
+				// prevent window scrolling
 				$('body').bind('touchmove', function (ev) {
 					ev.preventDefault();
 				});
@@ -74,9 +75,16 @@
 				Issue.Width = issueSize.x;
 				Issue.Height = issueSize.y;
 
-				canvas.onmousemove = Canvas_mousemove;
-				canvas.onmousedown = Canvas_mousedown;
-				canvas.onmouseup = Canvas_mouseup;
+				canvas.addEventListener("mousemove", Canvas_mousemove, false);
+				canvas.addEventListener("touchmove", Canvas_mousemove, true);
+				canvas.addEventListener("mousedown", Canvas_mousedown, false);
+				canvas.addEventListener("touchstart", Canvas_mousedown, false);
+				canvas.addEventListener("mouseup", Canvas_mouseup, false);
+				canvas.addEventListener("touchend", Canvas_mouseup, false);
+
+				//canvas.onmousemove = Canvas_mousemove;
+				//canvas.onmousedown = Canvas_mousedown;
+				//canvas.onmouseup = Canvas_mouseup;
 
 				if (hasStorage) {
 					restoreIssues();
