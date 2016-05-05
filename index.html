@@ -75,9 +75,9 @@
 				Issue.Height = issueSize.y;
 
 				canvas.addEventListener("mousemove", Canvas_mousemove, false);
-				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); Canvas_mousemove(); }, true);
+				canvas.addEventListener("touchmove", function () { Canvas_mousemove(); event.preventDefault(); }, true);
 				canvas.addEventListener("mousedown", Canvas_mousedown, false);
-				canvas.addEventListener("touchstart", Canvas_mousedown, false);
+				canvas.addEventListener("touchstart", function () { Canvas_mousedown(); event.preventDefault(); }, false);
 				canvas.addEventListener("mouseup", Canvas_mouseup, false);
 				canvas.addEventListener("touchend", Canvas_mouseup, false);
 				canvas.addEventListener("touchcancel", Canvas_mouseup, false);
