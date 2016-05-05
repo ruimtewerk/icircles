@@ -83,14 +83,6 @@
 				canvas.addEventListener("touchend", Canvas_mouseup, false);
 				canvas.addEventListener("touchcancel", Canvas_mouseup, false);
 
-//				canvas.addEventListener("mousemove", function () { alert('mousemove') }, false);
-//				canvas.addEventListener("touchmove", function (evt) { evt.preventDefault(); alert('touchmove'); }, true);
-//				canvas.addEventListener("mousedown", function () { alert('mousedown') }, false);
-//				canvas.addEventListener("touchstart", function () { Canvas_mousedown }, false);
-//				canvas.addEventListener("mouseup", function () { alert('mouseup') }, false);
-//				canvas.addEventListener("touchend", function () { alert('touchend') }, false);
-				//canvas.addEventListener("touchcancel", function () { alert('touchcancel') }, false);
-
 				if (hasStorage) {
 					restoreIssues();
 				}
@@ -168,7 +160,6 @@
 
 			function Canvas_mousemove(e) {
 				var pos = getMousePos(e);
-				alert(pos.x + "," + pos.y);
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
@@ -201,6 +192,7 @@
 				var pos = getMousePos(e);
 				var issueIndex = getIssueIntersection(pos.x, pos.y);
 				if (issueIndex != null) {
+					alert('issue');
 					draggedIssue = sprites[issueIndex];
 					draggedIssueIndex = issueIndex;
 					$('canvas').css('cursor', 'grabbing');
