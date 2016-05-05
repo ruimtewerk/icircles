@@ -51,6 +51,10 @@
 					alert("Geen localStorage!");
 				}
 
+				$('body').bind('touchmove', function (ev) {
+					ev.preventDefault();
+				});
+
 				infinityImg = new Image();
 				infinityImg.onload = function () {
 					draw();
