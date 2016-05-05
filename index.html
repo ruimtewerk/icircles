@@ -163,6 +163,7 @@
 
 			function Canvas_mousemove(e) {
 				var pos = getMousePos(e);
+				alert(pos.x + "," + pos.y);
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
