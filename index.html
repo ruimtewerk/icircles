@@ -161,7 +161,6 @@
 			function Canvas_mousemove(e) {
 				var pos = getMousePos(e);
 				if (draggedIssue != null) {
-					alert('issuemove');
 					// re-position
 					draggedIssue.x = pos.x;
 					draggedIssue.y = pos.y;
@@ -195,6 +194,8 @@
 				if (issueIndex != null) {
 					draggedIssue = sprites[issueIndex];
 					draggedIssueIndex = issueIndex;
+					var p = getMousePos(e);
+					drawFilledText(p.x, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue set");
 					$('canvas').css('cursor', 'grabbing');
 				}
 				else if (isOverAddButton(pos)) {
@@ -217,6 +218,8 @@
 				}
 				draggedIssue = null;
 				draggedIssueIndex = null;
+				var p = getMousePos(e);
+				drawFilledText(p.x, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue = null");
 				$('canvas').css('cursor', 'auto');
 			}
 
