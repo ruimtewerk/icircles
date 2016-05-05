@@ -190,12 +190,12 @@
 
 			function Canvas_mousedown(e) {
 				var pos = getMousePos(e);
+				drawFilledText(p.x + 200, p.y, "bold 12px Georgia", "#FF00FF", e.type);
 				var issueIndex = getIssueIntersection(pos.x, pos.y);
 				if (issueIndex != null) {
 					draggedIssue = sprites[issueIndex];
 					draggedIssueIndex = issueIndex;
-					var p = getMousePos(e);
-					drawFilledText(p.x + 200, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue set");
+
 					$('canvas').css('cursor', 'grabbing');
 				}
 				else if (isOverAddButton(pos)) {
@@ -205,6 +205,8 @@
 			}
 
 			function Canvas_mouseup(e) {
+				var pos = getMousePos(e);
+				drawFilledText(p.x + 200, p.y, "bold 12px Georgia", "#FF00FF", e.type);
 				if (draggedIssue != null) {
 					if (isInfinityIntersection(draggedIssue)) {
 						sprites.splice(draggedIssueIndex, 1);
@@ -218,8 +220,6 @@
 				}
 				draggedIssue = null;
 				draggedIssueIndex = null;
-				var p = getMousePos(e);
-				drawFilledText(p.x, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue = null");
 				$('canvas').css('cursor', 'auto');
 			}
 
