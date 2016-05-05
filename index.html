@@ -445,8 +445,10 @@
 			}
 
 			function storeIssues() {
-				var buffer = serializeIssues();
-				lstorage.setItem(lstorageItemName, buffer);
+				if (hasStorage) {
+					var buffer = serializeIssues();
+					lstorage.setItem(lstorageItemName, buffer);
+				}
 			}
 
 			function deserializeIssues(buffer) {
