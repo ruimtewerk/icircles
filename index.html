@@ -195,7 +195,7 @@
 					draggedIssue = sprites[issueIndex];
 					draggedIssueIndex = issueIndex;
 					var p = getMousePos(e);
-					drawFilledText(p.x, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue set");
+					drawFilledText(p.x + 200, p.y, "bold 11px Georgia", "#FF00FF", "DraggedIssue set");
 					$('canvas').css('cursor', 'grabbing');
 				}
 				else if (isOverAddButton(pos)) {
