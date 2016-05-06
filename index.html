@@ -80,7 +80,7 @@
 				canvas.addEventListener("touchmove", Canvas_touchmove, false);
 				canvas.addEventListener("touchstart", Canvas_touchstart, false);
 				canvas.addEventListener("touchend", Canvas_touchend, false);
-				canvas.addEventListener("touchcancel", Canvas_touchend, false);
+				canvas.addEventListener("touchcancel", Canvas_touchcancel, false);
 
 				if (hasStorage) {
 					restoreIssues();
@@ -235,6 +235,12 @@
 			function Canvas_touchend(e) {
 				var pos = getTouchPos(e);
 				drawCircle(pos.x, pos.y, 5, '#0000FF', 0)
+				handlePointerUp();
+			}
+
+			function Canvas_touchcancel(e) {
+				var pos = getTouchPos(e);
+				drawCircle(pos.x, pos.y, 5, '#FFFF00', 0)
 				handlePointerUp();
 			}
 
