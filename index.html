@@ -164,7 +164,7 @@
 
 			function Canvas_touchmove(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, '#FF0080', 0)
+				drawCircle(pos.x, pos.y, 5, '#FF0000', 0)
 				handlePointerMove(pos)
 
 				// prevent a scrolling action as a result of this touchmove triggering.
@@ -234,13 +234,13 @@
 
 			function Canvas_touchend(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, '#0000FF', 0)
+				drawCircle(pos.x, pos.y, 50, '#0000FF', 0)
 				handlePointerUp();
 			}
 
 			function Canvas_touchcancel(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, '#FFFF00', 0)
+				drawCircle(pos.x, pos.y, 50, '#FFFF00', 0)
 				handlePointerUp();
 			}
 
