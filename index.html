@@ -74,16 +74,13 @@
 				Issue.Width = issueSize.x;
 				Issue.Height = issueSize.y;
 
-				canvas.addEventListener('touchstart', sketchpad_touchStart, false);
-				canvas.addEventListener('touchmove', sketchpad_touchMove, false);
-
-				//canvas.addEventListener("mousemove", Canvas_mousemove, false);
-				//canvas.addEventListener("touchmove", function () { Canvas_mousemove(); event.preventDefault(); }, false);
-				//canvas.addEventListener("mousedown", Canvas_mousedown, false);
-				//canvas.addEventListener("touchstart", function () { Canvas_mousedown(); event.preventDefault(); }, false);
-				//canvas.addEventListener("mouseup", Canvas_mouseup, false);
-				//canvas.addEventListener("touchend", Canvas_mouseup, false);
-				//canvas.addEventListener("touchcancel", Canvas_mouseup, false);
+				canvas.addEventListener("mousemove", Canvas_mousemove, false);
+				canvas.addEventListener("mousedown", Canvas_mousedown, false);
+				canvas.addEventListener("mouseup", Canvas_mouseup, false);
+				canvas.addEventListener("touchmove", Canvas_touchmove, false);
+				canvas.addEventListener("touchstart", Canvas_touchstart, false);
+				canvas.addEventListener("touchend", Canvas_touchend, false);
+				//canvas.addEventListener("touchcancel", Canvas_touchcancel, false);
 
 				if (hasStorage) {
 					restoreIssues();
@@ -97,70 +94,6 @@
 				// check for the File API support
 				if (!window.File || !window.FileReader) {
 					alert('The File APIs are not fully supported in this browser.');
-				}
-			}
-
-			// Variables to keep track of the touch position
-			var touchX, touchY;
-
-			// Draws a dot at a specific position on the supplied canvas name
-			// Parameters are: A canvas context, the x position, the y position, the size of the dot
-			function drawDot(ctx, x, y, size) {
-				// Let's use black by setting RGB values to 0, and 255 alpha (completely opaque)
-				r = 0; g = 0; b = 0; a = 255;
-
-				// Select a fill style
-				ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
-
-				// Draw a filled circle
-				ctx.beginPath();
-				ctx.arc(x, y, size, 0, Math.PI * 2, true);
-				ctx.closePath();
-				ctx.fill();
-			}
-
-			// Clear the canvas context using the canvas width and height
-			function clearCanvas(canvas, ctx) {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-			}
-
-			// Draw something when a touch start is detected
-			function sketchpad_touchStart() {
-				// Update the touch co-ordinates
-				getTouchPos();
-
-				drawDot(ctx, touchX, touchY, 12);
-
-				// Prevents an additional mousedown event being triggered
-				event.preventDefault();
-			}
-
-			// Draw something and prevent the default scrolling when touch movement is detected
-			function sketchpad_touchMove(e) {
-				// Update the touch co-ordinates
-				getTouchPos(e);
-
-				// During a touchmove event, unlike a mousemove event, we don't need to check if the touch is engaged, since there will always be contact with the screen by definition.
-				drawDot(ctx, touchX, touchY, 12);
-
-				// Prevent a scrolling action as a result of this touchmove triggering.
-				event.preventDefault();
-			}
-
-			// Get the touch position relative to the top-left of the canvas
-			// When we get the raw values of pageX and pageY below, they take into account the scrolling on the page
-			// but not the position relative to our target div. We'll adjust them using "target.offsetLeft" and
-			// "target.offsetTop" to get the correct values in relation to the top left of the canvas.
-			function getTouchPos(e) {
-				if (!e)
-					var e = event;
-
-				if (e.touches) {
-					if (e.touches.length == 1) { // Only deal with one finger
-						var touch = e.touches[0]; // Get the information for finger #1
-						touchX = touch.pageX - touch.target.offsetLeft;
-						touchY = touch.pageY - touch.target.offsetTop;
-					}
 				}
 			}
 
@@ -225,8 +158,19 @@
 			}
 
 			function Canvas_mousemove(e) {
-				drawFilledText(400, 300, "bold 12px Georgia", "#FF0000", e.type);
-var pos = getMousePos(e);
+				var pos = getMousePos(e);
+				handlePointerMove(pos)
+			}
+
+			function Canvas_touchmove(e) {
+				var pos = getTouchPos(e);
+				handlePointerMove(pos)
+
+				// prevent a scrolling action as a result of this touchmove triggering.
+				event.preventDefault();
+			}
+
+			function handlePointerMove(pos) {
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
@@ -244,7 +188,7 @@ var pos = getMousePos(e);
 				}
 				else {
 					$('canvas').css('cursor', 'auto');
-				}
+				} 
 			}
 
 			function isClickable(pos) {
@@ -257,7 +201,18 @@ var pos = getMousePos(e);
 
 			function Canvas_mousedown(e) {
 				var pos = getMousePos(e);
-				drawFilledText(pos.x + 200, pos.y, "bold 12px Georgia", "#00FF00", e.type);
+				handlePointerDown(pos);
+			}
+
+			function Canvas_touchstart() {
+				var pos = getTouchPos(e);
+				handlePointerDown(pos);
+
+				// prevent an additional mousedown event being triggered
+				event.preventDefault();
+			}
+
+			function handlePointerDown(pos) {
 				var issueIndex = getIssueIntersection(pos.x, pos.y);
 				if (issueIndex != null) {
 					draggedIssue = sprites[issueIndex];
@@ -269,11 +224,17 @@ var pos = getMousePos(e);
 					initForm();
 					$('#addDiv').fadeIn("1000", function () { $('#addName').focus(); });
 				}
+			} 
+
+			function Canvas_mouseup() {
+				handlePointerUp();
 			}
 
-			function Canvas_mouseup(e) {
-				var pos = getMousePos(e);
-				drawFilledText(pos.x, pos.y, "bold 12px Georgia", "#0000FF", e.type);
+			function Canvas_touchend() {
+				handlePointerUp();
+			}
+
+			function handlePointerUp() {
 				if (draggedIssue != null) {
 					if (isInfinityIntersection(draggedIssue)) {
 						sprites.splice(draggedIssueIndex, 1);
@@ -316,6 +277,21 @@ var pos = getMousePos(e);
 					x: Math.round((e.clientX - rect.left) / (rect.right - rect.left) * canvas.width),
 					y: Math.round((e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height)
 				};
+			}
+
+			function getTouchPos(e) {
+				if (!e)
+					var e = event;
+
+				if (e.touches) {
+					if (e.touches.length == 1) {	// only deal with one finger
+						var touch = e.touches[0];	// get the information for finger #1
+						return {
+							x: touch.pageX - touch.target.offsetLeft,
+							y: touch.pageY - touch.target.offsetTop
+						};
+					}
+				}
 			}
 
 			function getIssueIntersection(x, y) {
