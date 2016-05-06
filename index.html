@@ -80,7 +80,7 @@
 				canvas.addEventListener("touchmove", Canvas_touchmove, false);
 				canvas.addEventListener("touchstart", Canvas_touchstart, false);
 				canvas.addEventListener("touchend", Canvas_touchend, false);
-				//canvas.addEventListener("touchcancel", Canvas_touchcancel, false);
+				canvas.addEventListener("touchcancel", Canvas_touchend, false);
 
 				if (hasStorage) {
 					restoreIssues();
