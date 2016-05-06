@@ -171,6 +171,7 @@
 			}
 
 			function handlePointerMove(pos) {
+				drawCircle(pos.x, pos.y, 5, '#FF0000', 0)
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
