@@ -164,11 +164,11 @@
 
 			function Canvas_touchmove(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, '#FF0000', 0)
+				drawCircle(pos.x, pos.y, 5, 'orange', 0)
 				handlePointerMove(pos)
 
 				// prevent a scrolling action as a result of this touchmove triggering.
-				event.preventDefault();
+				//event.preventDefault();
 			}
 
 			function handlePointerMove(pos) {
