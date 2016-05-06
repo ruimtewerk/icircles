@@ -164,6 +164,7 @@
 
 			function Canvas_touchmove(e) {
 				var pos = getTouchPos(e);
+				drawCircle(pos.x, pos.y, 5, '#FF00FF', 0)
 				handlePointerMove(pos)
 
 				// prevent a scrolling action as a result of this touchmove triggering.
@@ -171,7 +172,6 @@
 			}
 
 			function handlePointerMove(pos) {
-				drawCircle(pos.x, pos.y, 5, '#FF0000', 0)
 				if (draggedIssue != null) {
 					// re-position
 					draggedIssue.x = pos.x;
