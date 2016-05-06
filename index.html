@@ -51,7 +51,7 @@
 				}
 
 				// prevent window scrolling
-				$('body').bind('touchmove', function (ev) {
+				$('body').bind('touchmove touchstart', function (ev) {
 					ev.preventDefault();
 				});
 
@@ -164,7 +164,6 @@
 
 			function Canvas_touchmove(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, 'orange', 0)
 				handlePointerMove(pos)
 
 				// prevent a scrolling action as a result of this touchmove triggering.
@@ -207,11 +206,10 @@
 
 			function Canvas_touchstart(e) {
 				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 5, '#00FF00', 0)
 				handlePointerDown(pos);
 
 				// prevent an additional mousedown event being triggered
-				event.preventDefault();
+				//event.preventDefault();
 			}
 
 			function handlePointerDown(pos) {
@@ -233,12 +231,10 @@
 			}
 
 			function Canvas_touchend(e) {
-				drawCircle(600, 600, 50, 'yellow', 0)
 				handlePointerUp();
 			}
 
 			function Canvas_touchcancel(e) {
-				drawCircle(700, 700, 50, 'brown', 0)
 				handlePointerUp();
 			}
 
