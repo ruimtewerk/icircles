@@ -233,14 +233,12 @@
 			}
 
 			function Canvas_touchend(e) {
-				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 50, '#0000FF', 0)
+				drawCircle(600, 600, 50, 'yellow', 0)
 				handlePointerUp();
 			}
 
 			function Canvas_touchcancel(e) {
-				var pos = getTouchPos(e);
-				drawCircle(pos.x, pos.y, 50, '#FFFF00', 0)
+				drawCircle(700, 700, 50, 'brown', 0)
 				handlePointerUp();
 			}
 
