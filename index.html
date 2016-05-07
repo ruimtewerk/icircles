@@ -4,6 +4,7 @@
 		<title>ruimtewerk.nu - iCircles</title>
 		<link rel="stylesheet" type="text/css" href="iCircles.css" />
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.js"></script>
+		<script type="text/javascript" src="jscolor.js"></script>
 	</head>
 	<body onload="init()">
 		<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
@@ -51,7 +52,7 @@
 				}
 
 				// prevent window scrolling
-				$('body').bind('touchmove', function (ev) {
+				$('body').bind('touchmove touchstart', function (ev) {
 					ev.preventDefault();
 				});
 
@@ -463,7 +464,7 @@
 				var name = $('#addName').val();
 				var value = $('input[name=addValue]:checked', '#addForm').val();
 				var feeling = $('#addFeeling').val();
-				var color = $('#addColor').val();
+				var color = $('#addColor').attr('value');
 				var newIssue = new Issue(addButtonPos.x, addButtonPos.y + 70, color, name, feeling, value);
 				sprites.push(newIssue);
 
@@ -564,6 +565,10 @@
 				}
 			}
 
+			function setTextColor(picker) {
+				$('#addColor').val('#' + picker.toString());
+			}
+
 		</script>
 		<div id="page">
 			<div id="fileDiv">
@@ -583,7 +588,7 @@
 						<input class="valueRadio" type="radio" name="addValue" id="addValue_3" value="0" /><img class='valueImg' src='zero.png' />
 					</div>
 					<div id="colorDiv">
-						<input type="color" id="addColor" value="#FF8080"/>
+						<button class="jscolor {valueElement:'chosen-value', onFineChange:'setTextColor(this)'}" id="addColor" value="#FF80FF" />
 					</div>
 					<select id="addFeeling">
 						<option value="liefde">liefde</option>

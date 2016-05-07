@@ -69,8 +69,10 @@ canvas
 
 #addColor
 {
+	height: 20px;
 	width: 120px;
 	padding: 3px;
+	background-color: Purple;
 }
 
 #addFeeling
