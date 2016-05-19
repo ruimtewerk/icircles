@@ -49,6 +49,10 @@
 					draw();
 				});
 
+				window.onorientationchange = function () {
+					draw();
+				}
+
 				canvas = document.querySelector('canvas');
 				ctx = canvas.getContext('2d');
 				sprites = new Array();
