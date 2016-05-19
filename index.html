@@ -49,9 +49,10 @@
 					draw();
 				});
 
-				window.onorientationchange = function () {
+				$(window).on("orientationchange", function () {
+					setPageSize();
 					draw();
-				}
+				});
 
 				canvas = document.querySelector('canvas');
 				ctx = canvas.getContext('2d');
