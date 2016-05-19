@@ -1,13 +1,13 @@
-﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+﻿<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>ruimtewerk.nu - iCircles</title>
 		<link rel="stylesheet" type="text/css" href="iCircles.css" />
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.js"></script>
 		<script type="text/javascript" src="jscolor.js"></script>
+		<script type="text/javascript" src="aes.js"></script>
 	</head>
 	<body onload="init()">
-		<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
 
 		<script type="text/javascript">
 
@@ -21,11 +21,14 @@
 			var draggedIssueIndex;
 			var issueSize = { x: 125, y: 50 };
 			var infinityImg;
-			var infinityPos = { x: 790, y: 35 };
+			var infinityPos = { x: 860, y: 90 };
 			var infinitySize = { x: 116, y: 37 };
-			var addButtonPos = { x: 100, y: 65 };
+			var addButtonPos = { x: 100, y: 110 };
 			var addButtonSize = 25;
 			var aesKey = "tattvamasi";
+			var pageSizeX;
+			var pageSizeY;
+			var pageSizeMargin = 50;
 
 			// shim layer with setTimeout fallback
 			window.requestAnimFrame = (function () {
@@ -40,6 +43,12 @@
 			})(); 
 
 			function init() {
+				setPageSize();
+				$(window).on('resize', function () {
+					setPageSize();
+					draw();
+				});
+
 				canvas = document.querySelector('canvas');
 				ctx = canvas.getContext('2d');
 				sprites = new Array();
@@ -307,6 +316,24 @@
 						return s;
 				}
 				return null;
+			}
+
+			function setPageSize() {
+				var ratio = 4.0 / 3.0;
+				var winSizeX = $(window).width();
+				var winSizeY = $(window).height();
+				if ((winSizeX / winSizeY) >= ratio) {
+					// height leading
+					pageSizeY = winSizeY - pageSizeMargin;
+					pageSizeX = pageSizeY * ratio;
+				}
+				else {
+					// width leading
+					pageSizeX = winSizeX - pageSizeMargin;
+					pageSizeY = pageSizeX / ratio;
+				}
+				$('#page').width(pageSizeX);
+				$('#page').height(pageSizeY);
 			}
 
 			function fitToContainer(canvas) {
