@@ -303,10 +303,10 @@
 				if (e.touches) {
 					if (e.touches.length == 1) {	// only deal with one finger
 						var touch = e.touches[0];	// get the information for finger #1
-						alert(touch.target.offsetLeft);
+						alert(canvas.offsetLeft);
 						return {
-							x: touch.pageX - touch.target.offsetLeft,
-							y: touch.pageY - touch.target.offsetTop
+							x: touch.pageX - canvas.offsetLeft,
+							y: touch.pageY - canvas.offsetTop
 						};
 					}
 				}
