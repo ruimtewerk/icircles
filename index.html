@@ -320,8 +320,8 @@
 
 			function setPageSize() {
 				var ratio = 4.0 / 3.0;
-				var winSizeX = $(window).width();
-				var winSizeY = $(window).height();
+				var winSizeX = window.innerWidth || $(window).width();
+				var winSizeY = window.innerHeight || $(window).height();
 				if ((winSizeX / winSizeY) >= ratio) {
 					// height leading
 					pageSizeY = winSizeY - pageSizeMargin;
